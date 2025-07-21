@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embedded YouTube Video</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 2em;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center horizontally */
+            justify-content: center; /* Center vertically if body has a defined height */
+            min-height: 90vh; /* Takes up most of the viewport height */
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 1em;
+        }
+        .video-container {
+            margin-top: 20px;
+            /* Optional: Add a border or shadow around the video */
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 10px;
+            background-color: #fff;
+            text-align: center; /* Ensures the iframe itself is centered if it's smaller than the container */
+        }
+        /* Basic responsive styling for the iframe */
+        .video-container iframe {
+            max-width: 100%;
+            height: auto; /* Maintain aspect ratio */
+            display: block; /* Remove extra space below iframe */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Future trends argument presentation</h1>
+    <div class="video-container">
+        <iframe width="560" height="315"
+            src="https://youtu.be/XlrtMMbVHfc"
+            title="Future trends argument presentation"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+        </iframe>
+    </div>
+
+
+
+</body>
+</html>
