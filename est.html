@@ -3,18 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estimating Tool - Professional Judgement</title>
+    <title>Expert Judgement Estimating Tool</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
 </head>
 <body>
-
-    <h1>My Python Code</h1>
-
-    <p>Here is a simple Python function:</p>
-
-    <pre><code class="language-python">def hello_world():
+    <h1>Expert Judgement Estimating Tool</h1>
+    <pre><code class="language-python">
     """
-expert_judgement_estimation_program
+ExpertJudgementEstimationProgram
 
 This program calculates estimated project effort using case points, actors, technical complexity
 and environmental factors.
@@ -177,8 +173,11 @@ if __name__ == "__main__":
     print("*Use Case Points: \n")
     print_keys_of_dictionary(use_case_points)
 
-    # Loop asking for use case point selection, capturing invalid input then, re-prompting.
-    while True:
+    CHOOSING_USE_CASE = True
+    CHOOSING_ACTOR_TYPE = True
+
+    # Loop asking for use case point selection, capturing invalid input then re-prompting.
+    while CHOOSING_USE_CASE:
 
         UUCW_str = input("Please select which 'use case point' best applies: ")
 
@@ -186,23 +185,36 @@ if __name__ == "__main__":
 
             UUCW = return_value_of_key(UUCW_str, use_case_points)
 
-            break
-
-        print(f"\n!!'{UUCW_str}' is not a valid 'use case point'. Please re-enter!!\n")
+            choice = input("\nWould you like to add another use case point? Type 'y' to add another or any other key to move on: ")
+            
+            if choice.lower() != "y":
+                CHOOSING_USE_CASE = False
+                
+        else:
+            print(f"\n!!'{UUCW_str}' is not a valid 'use case point'. Please re-enter!!\n")
+        
 
     print("\n*Actor Type: \n")
     print_keys_of_dictionary(actor_type)
 
-    # Loop asking for actor type selection, capturing invalid input then, re-prompting.
-    while True:
+    # Loop asking for actor type selection, capturing invalid input then re-prompting.
+    while CHOOSING_ACTOR_TYPE:
 
         INVALID_ENTRY = False
 
         UAW_str = input("Please select which 'actor type' best applies: ")
+        
         if key_exists(UAW_str, actor_type):
+            
             UAW = return_value_of_key(UAW_str, actor_type)
-            break
-        print(f"\n!!'{UAW_str}' is not a valid 'actor type'. Please re-enter!!\n")
+            
+            choice = input("\nWould you like to add another use case point? Type 'y' to add another or any other key to move on: ")
+            
+            if choice.lower() != "y":
+                CHOOSING_ACTOR_TYPE = False
+        
+        else:
+            print(f"\n!!'{UAW_str}' is not a valid 'actor type'. Please re-enter!!\n")
 
 
     print("\n*Technical Complexity Factors: \n")
