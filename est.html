@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estimating Tool - Professional Judgement</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
+</head>
+<body>
+
+    <h1>My Python Code</h1>
+
+    <p>Here is a simple Python function:</p>
+
+    <pre><code class="language-python">def hello_world():
+    """
+expert_judgement_estimation_program
+
+This program calculates estimated project effort using case points, actors, technical complexity
+and environmental factors.
+
+Dependencies:
+    - None
+
+Functions:
+    - print_keys_of_dictionary(dictionary): Prints a given dictionary's keys.
+    - key_exists(selection, dictionary): Checks whether inputted selection matches a dictionary's
+      key
+    - return_value_of_key(selection, dictionary): Returns the value of a dictionary's previosuly
+      matched key.
+    - choice_confirmed(choice): Determines if a user's choice confirms an action.
+
+Usage:
+    Run the file as a script and follow on-screen prompts.
+
+"""
+
+import sys
+
+## Data ##
+
+use_case_points = {
+    "simple": 5,
+    "average": 10,
+    "complex": 15
+}
+
+actor_type = {
+    "simple": 1,
+    "average": 2,
+    "complex": 3
+}
+
+technical_complexity_factors = {
+    "Distributed system": 2,
+    "Performance objectives": 2,
+    "End-user efficiency": 1,
+    "Complex processing": 1,
+    "Reusable code": 1,
+    "Easy to install": 0.5,
+    "Easy to use": 0.5,
+    "Portable": 2,
+    "Easy to change": 1,
+    "Concurrent use": 1,
+    "Security": 1,
+    "Access for third parties": 1,
+    "Training needs": 1
+}
+
+enviornmental_factors = {
+    "Familiar with the development process": 2,
+    "Application experience": 2,
+    "Object-oriented experience": 1,
+    "Lead analyst capability": 1,
+    "Motivation": 1,
+    "Stable requirements": 0.5,
+    "Part-time staff": 0.5,
+    "Difficult programming language": 2
+}
+
+
+## Functions ##
+
+def print_keys_of_dictionary(dictionary):
+    """
+    Prints a given dictionary's keys.
+
+    Args:
+        dictionay (dict): a dictionary with numerical values.
+
+    Returns:
+        None.
+
+    """
+
+    dictionary_str = ""
+
+    for label in dictionary.keys():
+        dictionary_str += "-" + str(label) + "\n"
+
+    print(dictionary_str)
+
+
+def key_exists(selection, dictionary):
+    """
+    Checks whether inputted selection matches a dictionary's key.
+
+    Args:
+        selection (str): a user-inputted string.
+        dictionay (dict): a dictionary with numerical values.
+
+    Returns:
+        bool: True if match found, otherwise False.
+
+    """
+
+    for label in dictionary.keys():
+        if selection.lower() == str(label).lower():
+            return True
+
+    return False
+
+
+def return_value_of_key(selection, dictionary):
+    """
+    Returns the value of a dictionary's key.
+
+    Args:
+        selection (str): a user-inputted string.
+        dictionay (dict): a dictionary with numerical values.
+
+    Returns:
+        int or None:
+        - int of the value assigned to the matched key if matched.
+        - None if key does not match input.
+
+    """
+
+    for key, value in dictionary.items():
+        if selection.lower() == str(key).lower():
+            return value
+
+    return None
+
+
+def choice_confirmed(user_choice):
+    """
+    Determines if a user's choice confirms an action.
+
+    Args:
+        choice (str): a user-inputted string.
+
+    Returns:
+        bool or None:
+        - True if 'Y/y' inputted.
+        - False if 'N/n' inputted.
+        - None is anything else inputted.
+
+    """
+
+    if user_choice.lower() == "y":
+        return True
+    if user_choice.lower() == "n":
+        return False
+
+    return None
+
+
+## CLI logic ##
+
+if __name__ == "__main__":
+
+    # Initialise variables
+    T_FACT0R = 0
+    E_FACTOR = 0
+
+    print("*Use Case Points: \n")
+    print_keys_of_dictionary(use_case_points)
+
+    # Loop asking for use case point selection, capturing invalid input then, re-prompting.
+    while True:
+
+        UUCW_str = input("Please select which 'use case point' best applies: ")
+
+        if key_exists(UUCW_str, use_case_points):
+
+            UUCW = return_value_of_key(UUCW_str, use_case_points)
+
+            break
+
+        print(f"\n!!'{UUCW_str}' is not a valid 'use case point'. Please re-enter!!\n")
+
+    print("\n*Actor Type: \n")
+    print_keys_of_dictionary(actor_type)
+
+    # Loop asking for actor type selection, capturing invalid input then, re-prompting.
+    while True:
+
+        INVALID_ENTRY = False
+
+        UAW_str = input("Please select which 'actor type' best applies: ")
+        if key_exists(UAW_str, actor_type):
+            UAW = return_value_of_key(UAW_str, actor_type)
+            break
+        print(f"\n!!'{UAW_str}' is not a valid 'actor type'. Please re-enter!!\n")
+
+
+    print("\n*Technical Complexity Factors: \n")
+    print_keys_of_dictionary(technical_complexity_factors)
+
+    # Calculate Unadjusted Use Case Points (UUCP) and store as UUCP variable
+    UUCP = UUCW + UAW
+
+    # Loop asking for technical complexity selection, capturing invalid input then re-prompting.
+    while True:
+
+        # Initialise or reset flags
+        SELECTION_MADE = False
+        INVALID_ENTRY = False
+        WANTS_TO_QUIT = False
+
+        t_factor_str = input("Please select which 'technical complexity factor' best applies: ")
+
+        if key_exists(t_factor_str, technical_complexity_factors):
+
+            T_FACT0R += return_value_of_key(t_factor_str, technical_complexity_factors)
+
+            SELECTION_MADE = True
+
+        else:
+            print(f"\n!!'{t_factor_str}' is not a valid 'technical complexity factor'. Please "
+                  "re-enter!!\n")
+
+            INVALID_ENTRY = True
+
+        if SELECTION_MADE:
+
+            # Check if additional input is needed and re-prompt if invalid input.
+            while True:
+
+                choice = input("Would you like to add another factor? Type 'Y' or 'N': ")
+
+                if choice_confirmed(choice):
+                    SELECTION_MADE = False
+                    break
+                if choice_confirmed(choice) is False:
+                    WANTS_TO_QUIT = True
+                    break
+
+                print("!!Choose a valid option!!")
+
+        elif INVALID_ENTRY:
+            continue
+
+        else:
+            break
+
+        if WANTS_TO_QUIT:
+            break
+
+        continue
+
+    TCF = 0.6 + (0.01*T_FACT0R)
+
+
+    WANTS_TO_QUIT = False # Reset this flag as it is re-used below
+
+    print("\n*Environmental Factors: \n")
+    print_keys_of_dictionary(enviornmental_factors)
+
+
+    # Loop asking for use environmantal complexity selection, capturing invalid input then
+    # re-prompting.
+    while True:
+        # Initialise or reset flags
+        SELECTION_MADE = False
+        INVALID_ENTRY = False
+        WANTS_TO_QUIT = False
+
+        e_factor_str = input("Please select which 'environmental factor' best applies: ")
+
+        if key_exists(e_factor_str, enviornmental_factors):
+
+            score = input("What rating would you give this?")
+
+            E_FACTOR += return_value_of_key(e_factor_str, enviornmental_factors)
+
+            SELECTION_MADE = True
+
+        else:
+            print(f"\n!!'{e_factor_str}' is not a valid 'environmental factor'. Please "
+                  "re-enter!!\n")
+
+            INVALID_ENTRY = True
+
+        if SELECTION_MADE:
+
+            # Check if additional input is needed and re-prompt if invalid input.
+            while True:
+
+                choice = input("\nWould you like to add another factor? Type 'Y' or 'N': ")
+
+                if choice_confirmed(choice):
+                    SELECTION_MADE = False
+                    break
+                if choice_confirmed(choice) is False:
+                    WANTS_TO_QUIT = True
+                    break
+
+                print("\n!!Choose a valid option!!\n")
+
+        elif INVALID_ENTRY:
+            continue
+
+        else:
+            break
+
+        if WANTS_TO_QUIT:
+            break
+
+        continue
+
+    EF = 1.4 + (-0.03*E_FACTOR)
+
+    # Calculate the resultant use case points (UCP).
+    UCP = UUCP*TCF*EF
+
+    print(f"\n** THE ESTIMATED EFFORT FOR THIS PROJECT IS: {UCP} **")
+    sys.exit()
+
+</code></pre>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+
+</body>
+</html>
