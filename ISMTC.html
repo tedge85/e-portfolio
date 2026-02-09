@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pytest code</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
+</head>
+<body>
+    <h1>Assessment: Attack Tree Python Aplication</h1>
+    <pre><code class="language-python">
+# functions.py
+"""
+Tree Structure and Threat Summary Module
+
+This module provides functions for constructing, summarising and editing values
+of tree structures using the `anytree` library.
+
+Dependencies:
+    - json
+    - os
+    - subprocess
+    - anytree (Node, PreOrderIter, DotExporter)
+
+Functions:
+    - build_tree(data, parent=None): Constructs a tree from a given dictionary.
+    - load_json_file(file_name): Loads a JSON file into a dictionary.
+    - list_leaf_nodes(root): Returns all leaf node names in the tree.
+    - node_exists(node_name, root): Checks if a leaf node exists in the tree.
+    - return_matching_node(node_name, root): Retrieves a leaf node by its name.
+    - convert_to_float(input_value): Converts an input value to a float.
+    - assign_threat_value(target_node, threat_value, root): Assigns a threat value
+      to a leaf node.
+    - agregate_threat_scores(root): Aggregates threat values for all leaf nodes.
+    - print_threat_attributes(root): Displays assigned threat values for leaf nodes.
+    - export_tree_to_dot_file(root, file_name): Saves the tree structure to a DOT file.
+    - file_path_is_valid(path): Checks whether inputted file path is valid by verifying
+      if the file exists.
+    - dir_path_is_valid(path): Checks whether inputted directory path is valid by verifying
+      if the file exists.
+    - combine_file_paths(directory, file_name): Combines a directory path with a file name to
+      make a full file path.
+    - output_image(directory, file_name): Processes tree data in dot file and outputs graphical
+      PNG file representation of tree.
+    - record_threat_values_for_all_nodes(root): Records threat values in a
+      dictionary list.
+    - output_threat_values_to_txt_file(list_of_dicts, file_name, root): Exports
+      threat values for leaf nodes to a text file.
+    - choice_confirmed(choice): Confirms whether user input is 'Y' or 'y'.
+
+Usage:
+    Import the module and use the functions to create, visualise and add values
+    to tree structures.
+
+"""
+
+import json
+import os
+import subprocess
+from anytree import Node, PreOrderIter
+from anytree.exporter import DotExporter
+
+
+def build_tree(data, parent=None): # Microsoft Copilot (2025)
+    """
+        Builds tree recursively from root node.
+
+        Args:
+            data (dict): Node labels, detailing root, parents and children.
+
+        Returns:
+            Node: The nodes of the tree constructed.
+
+    """
+
+    # Create a node for the current dictionary entry (Microsoft Copilot, 2025).
+    node = Node(data["a"], parent=parent)
+
+    # Check if this node has children and recursively process them (Microsoft Copilot, 2025).
+    if "children" in data:
+        for child in data["children"]:
+            build_tree(child, parent=node)
+
+    return node
+
+
+def load_json_file(file_name):
+    """
+        Loads a selected JSON file into a dictionary structure.
+
+        Args:
+            file_name (string): Name assigned to JSON file.
+
+        Returns:
+            dict: A dictionary form of the JSON file or None if not found.
+
+    """
+    try:
+        # Open file (in read mode) with '.json' if not specified in file_name.
+        if not file_name.endswith(".json"):
+            with open(f"{file_name}.json", "r", encoding="utf-8") as f:
+                return json.load(f)
+        else:
+            # Do not add '.json' if already specified in file_name.
+            with open(f"{file_name}", "r", encoding="utf-8") as f:
+                return json.load(f)
+
+    except FileNotFoundError:
+        return None
+
+
+def list_leaf_nodes(root):
+    """
+        Lists all leaf node names.
+
+        Args:
+            root (Node): the root node object of the tree constructed.
+
+        Returns:
+            Str: A string of all leaf node names, separated by new lines.
+
+    """
+
+    node_str = ""
+
+    # Iterate through all nodes and extract name attribute, adding it to node_str
+    # with new line and tab separating each string.
+    for node in PreOrderIter(root):
+        if node.is_leaf:
+            node_str += node.name
+            node_str += "\n\t"
+            node_str += " "
+
+    return node_str
+
+
+def node_exists(node_name, root):
+    """
+        Confirms whether the given leaf node name is present in the tree.
+
+        Args:
+            node_name (str): User-inputted name to match to node attributes.
+            root (Node): the root node object of the tree constructed.
+
+        Returns:
+            bool: True if the node exists, otherwise False.
+
+    """
+    # Iterate through all nodes to find a name attribute that matches user's inputted name.
+    for node in PreOrderIter(root):
+        if node.is_leaf:
+            if node.name.lower() == node_name.lower():
+                return True
+
+    return False
+
+
+def return_matching_node(node_name, root):
+    """
+        Retrieves a leaf node that matches the given name.
+
+        Args:
+            node_name (str): User-inputted name to match to node attributes.
+            root (Node): the root node object of the tree constructed.
+
+        Returns:
+            optional[Node]: Node object if found, None otherwise.
+
+    """
+    # Iterate through all nodes to find a name attribute that matches user's inputted name.
+    for node in PreOrderIter(root):
+        if node.is_leaf:
+            if node.name.lower() == node_name.lower():
+
+                return node
+
+    return None
+
+
+def convert_to_float(input_value):
+    """
+        Attempts to convert an integer to a float.
+
+        Args:
+            input_value (int): User-inputted value.
+
+        Returns:
+            Optional[float]: The converted input_value if successful, otherwise None.
+
+    """
+    try:
+        return float(input_value)
+
+    except ValueError:
+
+        return None
+
+
+def assign_threat_value(target_node, threat_value, root):
+    """
+        Assigns the given value to a leaf node that matches the given name.
+
+        Args:
+            target_node (str): Name of the leaf node to update.
+            threat_value (float): Value to assign to threat_value attribute.
+            root (Node): root Node object of tree constructed.
+
+        Returns:
+            None.
+
+    """
+    # Iterate through all leaf nodes to find a name attribute that matches to known node.
+    for node in PreOrderIter(root): # c0fec0de(2023)
+        if node.is_leaf:
+            if node == target_node:
+                node.threat_value = round(threat_value, 1) # When found, assign inputted
+                                                        # threat value to threat_value attribute.
+
+
+def agregate_threat_scores(root):
+    """
+        Adds threat_value attributes for all leaf nodes in the tree.
+
+        Args:
+            root (Node): The root node of tree constructed.
+
+        Returns:
+            float: The sum of all threat values, rounded to one decimal place.
+
+    """
+    total_score = float(0)
+
+    # Iterate through all nodes to see if they have a threat_value assigned. If they do,
+    # add the score to total_score varaible. If not, ignore.
+    for node in PreOrderIter(root):
+        if node.is_leaf:
+            if hasattr(node, "threat_value"):
+                total_score += float(node.threat_value)
+
+    return round(total_score, 1)
+
+
+def print_threat_attributes(root):
+    """
+        Prints all threat values assigned to leaf nodes.
+
+        Args:
+            root (Node): The root node of tree constructed.
+
+        Returns:
+            None.
+
+    """
+    # Iterate through all leaf nodes to see if they have a threat_value assigned. If they do,
+    # print node name and value within string interpolation sentence, otherwise print
+    # node name and 'has no threat value assigned'..
+    for node in PreOrderIter(root):
+        if node.is_leaf:
+            if hasattr(node, "threat_value"):
+                print(f"Leaf node '{node.name}' has threat probability value: {node.threat_value}")
+            else:
+                print(f"Leaf node '{node.name}' has no threat probability value asssigned")
+
+
+def export_tree_to_dot_file(root, file_name): # OpenAI ChatGPT-4 (2025)
+    """
+        Exports tree constructed to dot file, ready to be converted to image.
+
+        Args:
+            root (Node): The root node of tree constructed.
+            file_name (str): The name of the file to be saved.
+
+        Returns:
+            None.
+
+    """
+    DotExporter(root).to_dotfile(f"{file_name}.dot") # Pass the nodes of the tree to the Dotxcporter
+                                             # method that outputs the nodes to a dot file that can
+                                             # be processed by image_output_confirmed() to output a
+                                             # graphical representation of the file, in JPEG format.
+
+
+def file_path_is_valid(path):
+    """
+        Checks whether inputted file path is valid by verifying if the file exists.
+
+        Args:
+            path (str): The file path specifying the location and file name.
+
+        Returns:
+            bool: True if the file exists, otherwise False
+
+    """
+
+    return os.path.isfile(path)
+
+
+def dir_path_is_valid(path):
+    """
+        Checks whether inputted directory path is valid by verifying if the file exists.
+
+        Args:
+            path (str): The directory path specifying the location.
+
+        Returns:
+            bool: True if the directory exists, otherwise False
+
+    """
+
+    return os.path.isdir(path)
+
+
+def combine_file_paths(directory, file_name):
+    """
+        Combines a directory path with a file name to make a full file path.
+
+        Args:
+            directory (str): The directory path specifying the location.
+            file_name (str): The name of the file.
+
+        Returns:
+            str: The full file path, formatted based on the operating system.
+
+    """
+
+    return os.path.join(directory, file_name)
+
+
+def output_image(directory, file_name): # OpenAI ChatGPT-4 (2025)
+    """
+        Processes tree data in dot file and outputs graphical PNG file representation of tree.
+
+        Args:
+            directory (str): User-inputted folder location.
+            file_name (str): The name of the file to be saved.
+
+        Returns:
+            bool: True if image outputted successfully, otherwise False.
+
+    """
+    ## The below processes were chosen instead of the more efficient to_picture
+    # method (C0feC0de, 2023) as this kept resulting in write permission denial.
+
+
+    # Read dot file of nodes and output as PNG file in inputted path.
+    try:
+        subprocess.check_call([
+            "dot",
+            f"{file_name}.dot",
+            "-Tpng",
+            "-o",
+            combine_file_paths(directory, file_name) + ".png"
+        ])
+        return True
+
+    # If file cannot be processed, catch the error.
+    except subprocess.CalledProcessError:
+        return False
+
+
+def record_threat_values_for_all_nodes(root):
+    """
+        Records threat values for all leaf nodes of the tree.
+
+        Args:
+            root (Node): The root node of tree constructed.
+
+        Returns:
+            list: List of dictionaries detailing node name and threat values.
+
+    """
+    threat_list = []
+
+    # Iterate through all leaf nodes, extracting name attribute and assigning as value for 'name'
+    # key.
+    for node in PreOrderIter(root):
+        if node.is_leaf:
+            node_data = {"name": node.name}
+
+            # If node has a threat value attribute assigned, assign this as value for 'threat_value'
+            # key, otherwise assign '0'.
+            if hasattr(node, "threat_value"):
+                node_data["threat value"] = node.threat_value
+            else:
+                node_data["threat value"] = 0
+
+            threat_list.append(node_data)
+
+    return threat_list
+
+
+def output_threat_values_to_txt_file(file_name, list_of_dicts, file_path, root):
+    """
+        Outputs threat values for all leaf nodes to a text file.
+
+        Args:
+            list_of_dicts (list): List of dictionaries containing node names and threat values.
+            file_path (str): User-inputted path for file.
+            root (Node): The root node of tree constructed.
+
+        Returns:
+            None.
+
+    """
+    with open(file_path, "w", encoding="utf-8") as f:
+
+         # Title for outputted text file.
+        str_to_print = ["\t\t\t\t\t\tTHREAT PROBABILITY VALUES: " + file_name]
+        str_to_print.append("\n\t\t\t\t\t\t----------------------------------------------")
+
+        # Iterate through each dictionary in list_of_dicts and include name and threat_value
+        # attributes in string interpolation, separating each nodes detail with a new line.
+        for line in list_of_dicts:
+            tpv = "THREAT PROBABILITY VALUE: " # Variable used to avoid overly long line (356).
+            str_attrs = [
+                    "\n\nLEAF  NODE:\t\t\t\t\t\t\t\t\t\t\t\t" + tpv + str(line["threat value"]),
+                    "\n" + line["name"]
+                    ]
+            str_to_print.append(" ".join(str_attrs))
+
+        # Include threat value total at bottom of text file.
+        total_threat_score = str(agregate_threat_scores(root))
+
+        otar = "OVERALL THREAT ASSESSMENT RATING: " # Variable used to avoid overly long line (366).
+        str_to_print.append("\n\t\t\t\t\t\t\t\t\t\t\t\t\t--------------------------------------")
+        str_to_print.append("\n\t\t\t\t\t\t\t\t\t\t\t\t\t" + otar + total_threat_score)
+        str_to_print.append("\n\t\t\t\t\t\t\t\t\t\t\t\t\t--------------------------------------")
+
+        f.write("\n".join(str_to_print))
+
+
+def choice_confirmed(choice):
+    """
+        checks whether user has inputted 'Y' or 'y'.
+
+        Args:
+            choice (str): user-inputted string to evaluate.
+
+        Returns:
+            bool: True if 'Y' or 'y' inputted, otherwise False.
+
+    """
+    if choice.lower() == "y":
+        return True
+
+    return False
+
+
+# main.py
+"""
+CLI module for building and editing attributes for an attack tree loaded from
+a JSON file.
+
+This module loads the JSON file and builds an on-screen visual representation
+of the attack tree (allowing for optional output as a PNG file) and allows
+users to assign threat probability values to each attack tree node before aggregating these
+scores and providing an optional text file output of said scores.
+
+Dependencies:
+    - json
+    - anytree (RenderTree) # c0fec0de(2023)
+    - functions.py (see below for list of functions used from this file)
+
+Functions:
+    - build_tree(data, parent=None): Constructs a tree from a given dictionary.
+    - load_json_file(file_name): Loads a JSON file into a dictionary.
+    - list_leaf_nodes(root): Returns all leaf node names in the tree.
+    - node_exists(node_name, root): Checks if a leaf node exists in the tree.
+    - return_matching_node(node_name, root): Retrieves a leaf node by its name.
+    - convert_to_float(input_value): Converts an input value to a float.
+    - assign_threat_value(target_node, threat_value, root): Assigns a threat value
+      to a leaf node.
+    - agregate_threat_scores(root): Aggregates threat values for all leaf nodes.
+    - print_threat_attributes(root): Displays assigned threat values for leaf nodes.
+    - export_tree_to_dot_file(root, file_name): Saves the tree structure to a DOT file.
+    - file_path_is_valid(path): Checks whether inputted file path is valid by verifying
+      if the file exists.
+    - dir_path_is_valid(path): Checks whether inputted directory path is valid by verifying
+      if the file exists.
+    - combine_file_paths(directory, file_name): Combines a directory path with a file name to
+      make a full file path.
+    - output_image(directory, file_name): Processes tree data in dot file and outputs graphical
+      PNG file representation of tree.
+    - record_threat_values_for_all_nodes(root): Records threat values in a
+      dictionary list.
+    - output_threat_values_to_txt_file(list_of_dicts, file_name, root): Exports
+      threat values for leaf nodes to a text file.
+    - choice_confirmed(choice): Confirms whether user input is 'Y' or 'y'.
+
+Usage:
+    Run the file as a script and follow on-screen prompts.
+
+"""
+
+import sys
+from anytree import RenderTree # c0fec0de (2023)
+from functions import (
+    build_tree,
+    load_json_file,
+    list_leaf_nodes,
+    node_exists,
+    return_matching_node,
+    convert_to_float,
+    assign_threat_value,
+    agregate_threat_scores,
+    print_threat_attributes,
+    export_tree_to_dot_file,
+    file_path_is_valid,
+    dir_path_is_valid,
+    combine_file_paths,
+    output_image,
+    record_threat_values_for_all_nodes,
+    output_threat_values_to_txt_file,
+    choice_confirmed
+)
+
+if __name__ == "__main__":
+
+    while True:
+        # Load the JSON file if it can be found, otherwise return an error message
+        # and prompt a retry.
+        try:
+            file_name = input("\nPlease enter the file name of your JSON file: ")
+            data = load_json_file(file_name)
+            root = build_tree(data) # Build the tree from the json file data.
+            print("\n-------------------------------")
+            print("\t  ATTACK TREE")
+            print("-------------------------------\n")
+
+            # Call RenderTree iterator #c0fec0de(2023) to list all node names in tree.
+            for pre, fill, node in RenderTree(root): #c0fec0de(2023)
+                print(f"{pre}{node.name}")
+            print("\n-------------------------------")
+            break
+
+        except TypeError:
+            print("\n!!JSON file not found. Please check file name and try again!!\n")
+
+
+    PIC_OUTPUT_PROMPT_NEEDED = True # Set this flag as True so that the below
+                                    # logic prompts for the option to output
+                                    # the attack tree as an image file.
+    while True:
+
+        PIC_CHOICE = None # Initialise variable so that line 75 can access it
+                          # if condition on line 52 is not met.
+
+        # Check if this is the first time the user is accessing the
+        # attribute menu. If so, give option of outputting an image
+        # file. If not, skip this step:
+        if PIC_OUTPUT_PROMPT_NEEDED:
+
+            PIC_CHOICE = input("\nWould you like to output the tree as an image "
+                            "file? Type 'Y' or 'N': ")
+
+        # If user would like to output as image, prompt for save path and file name. Error caught
+        # if invalid path or filr name.
+        if choice_confirmed(PIC_CHOICE):
+
+            while True:
+                export_tree_to_dot_file(root, file_name)
+                FOLDER_PATH = str(input("\nPlease type the path for where you'd like to save the " \
+                              "image: "))
+                file_path = combine_file_paths(FOLDER_PATH, file_name)
+                IMAGE_STR = file_name + ".png"
+
+
+                if output_image(FOLDER_PATH, file_name) and file_path_is_valid(file_path + ".png"):
+                    print(f"\n**{IMAGE_STR} saved to {FOLDER_PATH}**")
+                    # Switch the PIC_OUTPUT_PROMPT_NEEDED flag to false so that user is
+                    # not repeatedly prompted to output tree to image.
+                    PIC_OUTPUT_PROMPT_NEEDED = False
+                    break
+
+
+                # If new file path was not made, print error message.
+                print("\n!!Choose a valid directory or check your dot file is valid!!\n")
+
+        elif PIC_CHOICE.lower() != "n":
+            print("\n!!Choose a valid option!!\n")
+
+
+        break
+
+
+    while True:
+
+        NODE_CHOICE = str(input(f"\nFor which leaf node would you like to add a threat probability "
+                                f"value?\n\nOPTIONS: {list_leaf_nodes(root)}\n"))
+
+        if node_exists(NODE_CHOICE.lower(), root):
+            target_node = return_matching_node(NODE_CHOICE, root)
+            THREAT_CHOICE = "N" # Default value added so that line 140 can access this variable.
+
+            # Check if target node already has a threat_value assigned and, if so, ask if value
+            # should be replaced.
+            if hasattr(target_node, "threat_value"):
+                THREAT_CHOICE = input(f"{target_node.name} already has a threat probability "
+                                    f"value of {target_node.threat_value}. Do you "
+                                    "want to alter that? Choose 'Y' or 'N': ")
+
+            # If target node has no threat value or user confirmed they would like to replace a
+            # value, take input value and assign to threat_value attribute of node object.
+            if not hasattr(target_node, "threat_value") or choice_confirmed(THREAT_CHOICE):
+
+                while True:
+
+                    threat_value = input(f"\nPlease type the threat probability value you wish to "
+                                    f"assign to {target_node.name}: ")
+
+                    try:
+                        float_threat_value = convert_to_float(threat_value)
+                        assign_threat_value(target_node, float_threat_value, root)
+                        print("\n")
+                        print_threat_attributes(root)
+                        print(f"\nOVERALL THREAT ASSESSMENT RATING: {agregate_threat_scores(root)}")
+                        break
+                    # Error caught if non-integer or non-float typed.
+                    except TypeError:
+                        print("\n!!Type a number!!\n")
+        # Below statement is printed if node choice does not match leaf nodes available.
+        else:
+            print("\n!!Please select a valid option!!\n")
+
+
+        while True:
+
+            continue_choice = input("\nWould you like to assign another threat probability "
+                                    "value? Type 'Y' or 'N': ")
+
+            # If no other threat value is to be inputted, user is directed back to 2nd
+            # 'while loop' (choosing a node to add a threat value to).
+            if choice_confirmed(continue_choice):
+                break
+
+            if continue_choice.lower() != "n":
+
+                print("\n!!Please choose a valid option!!\n")
+
+            else:
+                # Record threat value attributes in dictionary list format that can be
+                # easily outputted to txt file with output_threat_values_to_txt_file().
+                all_threat_values = record_threat_values_for_all_nodes(root)
+
+                while True:
+                    output_choice = input("\nWould you like to output a copy of "
+                                        "the threat probability values? Type 'Y' or 'N': ")
+
+
+                    while True:
+                        PATH = str(input("\nPlease type the path for where you'd like to save the "
+                               "image: "))
+                        # If path provided is valid, save here using file_name value.
+                        if dir_path_is_valid(PATH):
+
+                            text_f_path = combine_file_paths(PATH, file_name) + " threat values"
+                            break
+
+                        # Error message displayed if provided path in which to save is invalid.
+                        print("!!Choose a valid folder directory!!")
+
+                    if choice_confirmed(output_choice):
+
+                        output_threat_values_to_txt_file(
+                            file_name,all_threat_values,text_f_path,root
+                            )
+
+                        # If path provided is valid, save here using file_name value +
+                        # 'threat values'.
+                        if file_path_is_valid(text_f_path):
+
+                            print(f"\n**Threat probability values printed to '{file_name} "
+                                "threat values.txt' file**\n")
+
+                            print("\nGoodbye!\n")
+
+                            sys.exit()
+
+                        else:
+                            # Error message displayed if provided path in which to save is invalid.
+                            print("!!Choose a valid directory!!")
+
+                    elif output_choice.lower() == "n":
+
+                        print("\nGoodbye!\n")
+
+                        sys.exit()
+
+                    else:
+
+                        print("\n!!Please choose a valid option!!\n")
+
+
+# tests.py
+'''
+Unit tests for the functions.py module.
+
+This module contains 5 unittest test suites:
+    - JsonFileTests: Unit tests for functions that require accesss to a JSON file.
+    - ConvertToFloatTests: Unit tests for convert_to_float function.
+    - OutputImageTests: Unit tests for the output_image function.
+    - PathFunctionsTests: Unit tests for functions that process folder paths, file paths or both.
+    - ChoiceConfirmedTests: Unit tests for choice_confirmed function.
+
+These test suites validate the expected output of the following test cases:
+
+Test Suites and correstponding Test Cases:
+    - JsonFileTests:
+        - test_load_present_json_file: Tests to see if known valid JSON file loads as a dictionary.
+        - test_load_missing_json_file: Tests to see if missing JSON file returns 'None'.
+        - test_load_json_file_with_json_suffix: Tests to see if JSON file loads successfully with
+          .json suffix.
+        - test_load_json_file_without_json_suffix: Tests to see if JSON file loads successfully
+          without .json suffix.
+        - test_list_leaf_nodes: Tests list_leaf_nodes returns list of all leaf nodes in tree.
+        - test_node_exists_true: Tests node_exists returns True when it can match the leaf node.
+        - test_node_exists_false: Tests node_exists returns False when it can't match the leaf node.
+
+    - ConvertToFloatTests:
+        - test_covert_to_float_success: Tests whether covert_to_float returns a float when integer
+          inputted.
+        - test_covert_to_float_error: Tests whether covert_to_float returns None when string
+          inputted.
+
+    - OutputImageTests:
+        - test_output_image_valid_dir_and_file: Tests whether image is outputted to known valid
+          directory, accessing valid file with .dot file.
+        - test_output_image_invalid_dir: Tests that False is returned when method tries to access
+          known invalid directory.
+        - test_output_image_invalid_file_name: Tests that False is returned when method tries to
+          access known invalid file.
+        - test_output_image_no_dot_file: Tests that False is returned when method tries to process
+          file with no .dot file.
+
+    - PathFunctionsTests:
+        - test_combine_file_paths: Tests whether 2 file paths are correctly combined.
+        - test_combine_file_paths: Tests whether 2 file paths are correctly combined.
+        - test_dir_path_is_valid_valid_dir: Tests whether valid directory returns True.
+        - test_dir_path_is_valid_invalid_dir: Tests whether invalid directory returns False.
+        - test_file_path_is_valid_valid_file: Tests whether valid file path returns True.
+        - test_file_path_is_valid_invalid_file: Tests whether invalid file path returns False.
+
+    - ChoiceConfirmedTests:
+        - test_choice_confirmed_lower_y: Tests whether lower case 'y' returns True.
+        - test_choice_confirmed_cap_y: Tests whether capital 'Y' returns True.
+        - test_choice_confirmed_cap_n: Tests whether capital 'N' returns False.
+        - test_choice_confirmed_n: Tests whether capital 'n' returns False.
+
+To run the tests, use:
+    python -m unittest tests.py
+
+'''
+
+import unittest
+
+from functions import (
+    choice_confirmed,
+    build_tree,
+    export_tree_to_dot_file,
+    load_json_file,
+    list_leaf_nodes,
+    node_exists,
+    convert_to_float,
+    output_image,
+    combine_file_paths,
+    file_path_is_valid,
+    dir_path_is_valid
+)
+
+
+class JsonFileTests(unittest.TestCase):
+    '''
+    Unit tests for functions that require accesss to a JSON file.
+
+    This test suite validates the correct behaviour of the following functions:
+        - load_json_file
+        - list_leaf_nodes
+        - node_exists
+
+    Methods:
+    - test_load_present_json_file: Tests to see if known valid JSON file loads as a dictionary.
+    - test_load_missing_json_file: Tests to see if missing JSON file returns 'None'.
+    - test_load_json_file_with_json_suffix: Tests to see if JSON file loads successfully with
+      .json suffix.
+    - test_load_json_file_without_json_suffix: Tests to see if JSON file loads successfully
+      without .json suffix.
+    - test_list_leaf_nodes: Tests list_leaf_nodes returns list of all leaf nodes in tree.
+    - test_node_exists_true: Tests node_exists returns True when it can match the leaf node.
+    - test_node_exists_false: Tests node_exists returns False when it can't match the leaf node.
+
+    '''
+
+    def setUp(self):
+
+        self.test_dict = {
+        "a": "root",
+        "children": [
+        {
+        "a": "new_tree",
+        "children": [
+            {
+            "a": "sub0A"
+            },
+            {
+            "a": "sub0B"
+            }
+        ]
+        },
+        {
+        "a": "sub1"
+        }
+        ]
+        } #c0fec0de(2023)
+
+        self.test_list_w_threat_value = [
+            {'name': 'root',
+            'threat probability value': 2.0},
+            {'name': 'new_tree',
+            'threat probability value': 0},
+            {'name': 'sub0A',
+            'threat probability value': 0},
+            {'name': 'sub0B',
+            'threat probability value': 0},
+            {'name': 'sub1',
+            'threat probability value': 0}
+        ]
+
+        data = load_json_file("test")
+        self.root = build_tree(data)
+        self.file_name = "test"
+        export_tree_to_dot_file(self.root, self.file_name)
+
+
+    def test_load_present_json_file(self):
+        '''Tests to see if known valid JSON file loads as a dictionary.'''
+
+        self.assertEqual(load_json_file("test"), self.test_dict)
+
+
+    def test_load_missing_json_file(self):
+        '''Tests to see if missing JSON file returns 'None'.'''
+
+        self.assertEqual(load_json_file("test2"), None)
+
+
+    def test_load_json_file_with_json_suffix(self):
+        '''Tests to see if JSON file loads successfully with .json suffix.'''
+
+        method = load_json_file("test.json")
+
+        self.assertNotEqual(method, None)
+
+
+    def test_load_json_file_without_json_suffix(self):
+        '''Tests to see if JSON file loads successfully without .json suffix.'''
+
+        method = load_json_file("test")
+
+        self.assertNotEqual(method, None)
+
+
+    def test_list_leaf_nodes(self):
+        '''Tests list_leaf_nodes returns list of all leaf nodes in tree.'''
+
+        string = "sub0A\n\t sub0B\n\t sub1\n\t "
+
+        self.assertEqual(list_leaf_nodes(self.root), string)
+
+
+    def test_node_exists_true(self):
+        '''Tests node_exists returns True when it can match the leaf node.'''
+
+        method = node_exists("sub1", self.root)
+
+        self.assertTrue(method)
+
+
+    def test_node_exists_false(self):
+        '''Tests node_exists returns False when it can't match the leaf node.'''
+
+        method = node_exists("not there", self.root)
+
+        self.assertFalse(method)
+
+
+class ConvertToFloatTests(unittest.TestCase):
+    '''
+    Unit tests for convert_to_float function.
+
+    This test suite validates the correct behaviour of the convert_to_float function.
+
+    Methods:
+    - test_covert_to_float_success: Tests whether covert_to_float returns a float when integer
+      inputted.
+    - test_covert_to_float_error: Tests whether covert_to_float returns None when string inputted.
+
+    '''
+
+    def test_covert_to_float_success(self):
+        '''Tests whether covert_to_float returns a float when integer inputted.'''
+
+        method = convert_to_float(3)
+
+        self.assertEqual(method, 3.0)
+
+
+    def test_covert_to_float_error(self):
+        '''Tests whether covert_to_float returns None when string inputted.'''
+
+        method = convert_to_float("string")
+
+        self.assertEqual(method, None)
+
+
+class OutputImageTests(unittest.TestCase):
+    '''
+    Unit tests for the output_image function.
+
+    This test suite validates the correct behaviour of the output_image function.
+
+    Methods:
+    - test_output_image_valid_dir_and_file: Tests whether image is outputted to known valid
+      directory, accessing valid file with .dot file.
+    - test_output_image_invalid_dir: Tests that False is returned when method tries to access known
+      invalid directory.
+    - test_output_image_invalid_file_name: Tests that False is returned when method tries to access
+      known invalid file.
+    - test_output_image_no_dot_file: Tests that False is returned when method tries to process file
+      with no .dot file.
+
+    '''
+
+    def test_output_image_valid_dir_and_file(self):
+        '''
+        Tests whether image is outputted to known valid directory, accessing
+        valid file with .dot file.
+
+        '''
+
+        valid_directory = "C:\\Users\\User\\Pictures"
+        file_name = "test"
+
+        method = output_image(valid_directory, file_name)
+
+        self.assertTrue(method)
+
+
+    def test_output_image_invalid_dir(self):
+        '''Tests that False is returned when method tries to access known invalid directory.'''
+
+        directory = "invalid directory"
+        file_name = "test"
+
+        method = output_image(directory, file_name)
+
+        self.assertFalse(method)
+
+    def test_output_image_invalid_file_name(self):
+        '''Tests that False is returned when method tries to access known invalid file.'''
+
+        valid_directory = "C:\\Users\\User\\Pictures"
+        invalid_file_name = "missing file"
+
+        method = output_image(valid_directory, invalid_file_name)
+
+        self.assertFalse(method)
+
+
+    def test_output_image_no_dot_file(self):
+        '''Tests that False is returned when method tries to process file with no .dot file.'''
+
+        valid_directory = "C:\\Users\\User\\Pictures"
+        file_name_w_no_dot_file = "test threat values"
+
+        method = output_image(valid_directory, file_name_w_no_dot_file)
+
+        self.assertFalse(method)
+
+
+class PathFunctionsTests(unittest.TestCase):
+    '''
+    Unit tests for functions that process folder paths, file paths or both.
+
+    This test suite validates the correct behaviour of the following functions:
+        - combine_file_paths
+        - dir_path_is_valid
+        - dir_path_is_valid
+        - file_path_is_valid
+
+    Methods:
+    - test_combine_file_paths: Tests whether 2 file paths are correctly combined.
+    - test_dir_path_is_valid_valid_dir: Tests whether valid directory returns True.
+    - test_dir_path_is_valid_invalid_dir: Tests whether invalid directory returns False.
+    - test_file_path_is_valid_valid_file: Tests whether valid file path returns True.
+    - test_file_path_is_valid_invalid_file: Tests whether invalid file path returns False.
+
+    '''
+
+    def test_combine_file_paths(self):
+        '''Tests whether 2 file paths are correctly combined.'''
+
+        folder_path = "C:\\Users\\User\\Pictures"
+        file_name = "test"
+
+        expected_file_path = "C:\\Users\\User\\Pictures\\test"
+
+        method = combine_file_paths(folder_path, file_name)
+
+        self.assertEqual(method, expected_file_path)
+
+
+    def test_dir_path_is_valid_valid_dir(self):
+        '''Tests whether valid directory returns True.'''
+
+        location = "C:\\Users\\User\\Pictures\\"
+
+        method = dir_path_is_valid(location)
+
+        self.assertTrue(method)
+
+
+    def test_dir_path_is_valid_invalid_dir(self):
+        '''Tests whether invalid directory returns False.'''
+
+        location = "invalid location"
+
+        method = dir_path_is_valid(location)
+
+        self.assertFalse(method)
+
+
+    def test_file_path_is_valid_valid_file(self):
+        '''Tests whether valid file path returns True.'''
+
+        file_path = (
+            "C:\\Users\\User\\Documents\\University of Essex Online\\Information Security"
+            "\\Assessment 2\\ATThreatCalculator\\Pre-digitalisation AT 1.json"
+            )
+
+        method = file_path_is_valid(file_path)
+
+        self.assertTrue(method)
+
+
+    def test_file_path_is_valid__invalid_file(self):
+        '''Tests whether invalid file path returns False.'''
+
+        file_path = "invalid file path"
+
+        method = file_path_is_valid(file_path)
+
+        self.assertFalse(method)
+
+
+class ChoiceConfirmedTests(unittest.TestCase):
+    '''
+    Unit tests for choice_confirmed function.
+
+    This test suite validates the correct behaviour of the choice_confirmed function:
+
+    Methods:
+    - test_choice_confirmed_lower_y: Tests whether lower case 'y' returns True.
+    - test_choice_confirmed_cap_y: Tests whether capital 'Y' returns True.
+    - test_choice_confirmed_cap_n: Tests whether capital 'N' returns False.
+    - test_choice_confirmed_n: Tests whether capital 'n' returns False.
+
+    '''
+
+    def test_choice_confirmed_lower_y(self):
+        '''Tests whether lower case 'y' returns True.'''
+
+        self.assertTrue(choice_confirmed("y"))
+
+
+    def test_choice_confirmed_cap_y(self):
+        '''Tests whether capital 'Y' returns True.'''
+
+        self.assertTrue(choice_confirmed("Y"))
+
+
+    def test_choice_confirmed_cap_n(self):
+        '''Tests whether capital 'N' returns False.'''
+
+        self.assertFalse(choice_confirmed("N"))
+
+
+    def test_choice_confirmed_n(self):
+        '''Tests whether capital 'n' returns False.'''
+
+        self.assertFalse(choice_confirmed("n"))
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+
+    </code></pre>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+
+</body>
+</html>
