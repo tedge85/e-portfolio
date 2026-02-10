@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pytest code</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
+</head>
+<body>
+    <h1>Assignment Description: Database Query (Unseen Lab Test)</h1>
+    <pre><code class="language-python">
+      # Setup
+      -- Creating DEPT schema.
+CREATE TABLE DEPT (
+	DEPTNO int PRIMARY KEY,
+    DNAME char,
+    LOC char
+);
+
+-- ALTER TABLE DEPT
+-- ADD PRIMARY KEY (DEPTNO);
+
+-- Creating EMP schema.
+CREATE TABLE EMP (
+	EMPNO int PRIMARY KEY,
+    ENAME char,
+    JOB char,
+    MGR int,
+    HIREDATE date,
+    SAL int,
+    COMM int,
+    DEPTNO int,
+    FOREIGN KEY(DEPTNO) references DEPT(DEPTNO)
+);
+
+-- Date changed to different format.
+SELECT DATE_FORMAT(HIREDATE, '%d-%b-%y') AS FORMATTED_DATE
+FROM EMP;
+
+-- Default character limit of 1 changed for columns containing strings. 
+ALTER TABLE EMP
+MODIFY ENAME char(15);
+
+ALTER TABLE EMP
+MODIFY COLUMN JOB char(15);
+
+ALTER TABLE DEPT
+MODIFY COLUMN DNAME char(15);
+
+ALTER TABLE DEPT
+MODIFY COLUMN LOC char(15);
+
+-- Entering values into DEPT table.
+INSERT INTO DEPT
+VALUES (10, 'ACCOUNTING', 'NEW YORK');
+
+INSERT INTO DEPT
+VALUES (20, 'RESEARCH', 'DALLAS');
+
+INSERT INTO DEPT
+VALUES (30, 'SALES', 'CHICAGO');
+
+-- Entering values into EMP table.
+INSERT INTO EMP 
+VALUES (7369, 'SMITH', 'CLERK', 7902, '1980-12-17', 800, NULL, 20);
+
+INSERT INTO EMP 
+VALUES (7499, 'ALLEN', 'SALESMAN', 7698, '1980-02-20', 1600, 300, 30);
+
+INSERT INTO EMP 
+VALUES (7521, 'WARD', 'SALESMAN', 7698, '1981-02-22', 1250, 500, 30);
+
+-- Amending inpuut error.
+UPDATE EMP
+SET HIREDATE = '1981-02-20'
+WHERE EMPNO = 7499;
+
+INSERT INTO EMP 
+VALUES (7566, 'JONES', 'MANAGER', 7839, '1981-04-02', 2975, NULL, 20);
+
+INSERT INTO EMP 
+VALUES (7654, 'MARTIN', 'SALESMAN', 7698, '1981-09-28', 1250, 1400, 30);
+
+INSERT INTO EMP 
+VALUES (7698, 'BLAKE', 'MANAGER', 7839, '1981-05-01', 2850, NULL, 30);
+
+INSERT INTO EMP 
+VALUES (7782, 'CLARK', 'MANAGER', 7839, '1981-06-09', 2450, NULL, 10);
+
+INSERT INTO EMP 
+VALUES (7788, 'SCOTT', 'ANALYST', 7566, '1987-04-19', 3000, NULL, 20);
+
+INSERT INTO EMP 
+VALUES (7839, 'KING', 'PRESIDENT', NULL, '1981-11-17', 5000, NULL, 10);
+
+INSERT INTO EMP 
+VALUES (7844, 'TURNER', 'SALESMAN', 7698, '1981-09-08', 1500, 0, 30);
+
+INSERT INTO EMP 
+VALUES (7876, 'ADAMS', 'CLERK', 7788, '1987-05-23', 1100, NULL, 20);
+
+INSERT INTO EMP 
+VALUES (7900, 'JAMES', 'CLERK', 7698, '1981-12-03', 950, NULL, 30);
+
+INSERT INTO EMP 
+VALUES (7902, 'FORD', 'ANALYST', 7566, '1981-12-03', 3000, NULL, 20);
+
+INSERT INTO EMP 
+VALUES (7934, 'MILLER', 'CLERK', 7782, '1982-01-23', 1300, NULL, 10);
+
+-- Displaying DEPT table.
+SELECT *
+FROM DEPT;
+
+-- Displaying EMP table in correct format.
+SELECT EMPNO, ENAME, JOB, MGR, DATE_FORMAT(HIREDATE, '%d-%b-%y') AS HIREDATE, SAL, COMM, DEPTNO
+FROM EMP;
+
+-- 1. List all Employees whose salary is greater than 1,000 but not 2,000. Show the Employee Name, Department and Salary.
+SELECT ENAME AS 'EMPLOYEE NAME', DNAME AS 'DEPARTMENT', SAL AS 'SALARY'
+FROM DEPT, EMP
+WHERE SAL > 1000 AND SAL <= 2000;
+
+-- 2. Count the number of people in department 30 who receive a salary and a commission. 
+SELECT COUNT(*)
+FROM EMP
+WHERE SAL IS NOT NULL AND SAL != 0 AND COMM IS NOT NULL AND COMM != 0 AND DEPTNO = 30;
+
+-- 3. Find the name and salary of the employees that have a salary greater or equal to 1,000 and live in Dallas.
+SELECT ENAME AS 'DALLAS EMPLOYEE NAME', SAL AS 'SALARY'
+FROM EMP AS E
+INNER JOIN DEPT AS D ON E.DEPTNO = D.DEPTNO 
+WHERE E.SAL >= 1000 AND D.LOC = 'DALLAS';
+
+-- 4. Find all departments that do not have any current employees. (4 marks)
+SELECT E.*
+FROM EMP AS E
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM DEPT AS D
+    WHERE D.DEPTNO = E.DEPTNO
+      AND D.DNAME = 'ACCOUNTING'
+      OR D.DNAME = 'RESEARCH'
+      OR D.DNAME = 'SALES'
+);
+
+-- 5. List the department number, the average salary, and the number/count of employees of each department.
+SELECT D.DNAME AS 'DEPARTMENT NAME', E.DEPTNO AS 'DEPARTMENT NUMBER', AVG(E.SAL) AS 'AVERAGE SALARY', COUNT(E.EMPNO) AS 'NUMBER OF EMPLOYEES'
+FROM DEPT AS D
+INNER JOIN EMP AS E ON E.DEPTNO = D.DEPTNO
+GROUP BY D.DEPTNO;
+
+
+
+      # Answers
+    -- Creating DEPT schema.
+CREATE TABLE DEPT (
+	DEPTNO int PRIMARY KEY,
+    DNAME char,
+    LOC char
+);
+
+-- ALTER TABLE DEPT
+-- ADD PRIMARY KEY (DEPTNO);
+
+-- Creating EMP schema.
+CREATE TABLE EMP (
+	EMPNO int PRIMARY KEY,
+    ENAME char,
+    JOB char,
+    MGR int,
+    HIREDATE date,
+    SAL int,
+    COMM int,
+    DEPTNO int,
+    FOREIGN KEY(DEPTNO) references DEPT(DEPTNO)
+);
+
+-- Date changed to different format.
+SELECT DATE_FORMAT(HIREDATE, '%d-%b-%y') AS FORMATTED_DATE
+FROM EMP;
+
+-- Default character limit of 1 changed for columns containing strings. 
+ALTER TABLE EMP
+MODIFY ENAME char(15);
+
+ALTER TABLE EMP
+MODIFY COLUMN JOB char(15);
+
+ALTER TABLE DEPT
+MODIFY COLUMN DNAME char(15);
+
+ALTER TABLE DEPT
+MODIFY COLUMN LOC char(15);
+
+-- Entering values into DEPT table.
+INSERT INTO DEPT
+VALUES (10, 'ACCOUNTING', 'NEW YORK');
+
+INSERT INTO DEPT
+VALUES (20, 'RESEARCH', 'DALLAS');
+
+INSERT INTO DEPT
+VALUES (30, 'SALES', 'CHICAGO');
+
+-- Entering values into EMP table.
+INSERT INTO EMP 
+VALUES (7369, 'SMITH', 'CLERK', 7902, '1980-12-17', 800, NULL, 20);
+
+INSERT INTO EMP 
+VALUES (7499, 'ALLEN', 'SALESMAN', 7698, '1980-02-20', 1600, 300, 30);
+
+INSERT INTO EMP 
+VALUES (7521, 'WARD', 'SALESMAN', 7698, '1981-02-22', 1250, 500, 30);
+
+-- Amending inpuut error.
+UPDATE EMP
+SET HIREDATE = '1981-02-20'
+WHERE EMPNO = 7499;
+
+INSERT INTO EMP 
+VALUES (7566, 'JONES', 'MANAGER', 7839, '1981-04-02', 2975, NULL, 20);
+
+INSERT INTO EMP 
+VALUES (7654, 'MARTIN', 'SALESMAN', 7698, '1981-09-28', 1250, 1400, 30);
+
+INSERT INTO EMP 
+VALUES (7698, 'BLAKE', 'MANAGER', 7839, '1981-05-01', 2850, NULL, 30);
+
+INSERT INTO EMP 
+VALUES (7782, 'CLARK', 'MANAGER', 7839, '1981-06-09', 2450, NULL, 10);
+
+INSERT INTO EMP 
+VALUES (7788, 'SCOTT', 'ANALYST', 7566, '1987-04-19', 3000, NULL, 20);
+
+INSERT INTO EMP 
+VALUES (7839, 'KING', 'PRESIDENT', NULL, '1981-11-17', 5000, NULL, 10);
+
+INSERT INTO EMP 
+VALUES (7844, 'TURNER', 'SALESMAN', 7698, '1981-09-08', 1500, 0, 30);
+
+INSERT INTO EMP 
+VALUES (7876, 'ADAMS', 'CLERK', 7788, '1987-05-23', 1100, NULL, 20);
+
+INSERT INTO EMP 
+VALUES (7900, 'JAMES', 'CLERK', 7698, '1981-12-03', 950, NULL, 30);
+
+INSERT INTO EMP 
+VALUES (7902, 'FORD', 'ANALYST', 7566, '1981-12-03', 3000, NULL, 20);
+
+INSERT INTO EMP 
+VALUES (7934, 'MILLER', 'CLERK', 7782, '1982-01-23', 1300, NULL, 10);
+
+-- Displaying DEPT table.
+SELECT *
+FROM DEPT;
+
+-- Displaying EMP table in correct format.
+SELECT EMPNO, ENAME, JOB, MGR, DATE_FORMAT(HIREDATE, '%d-%b-%y') AS HIREDATE, SAL, COMM, DEPTNO
+FROM EMP;
+
+-- 1. List all Employees whose salary is greater than 1,000 but not 2,000. Show the Employee Name, Department and Salary.
+SELECT ENAME AS 'EMPLOYEE NAME', DNAME AS 'DEPARTMENT', SAL AS 'SALARY'
+FROM DEPT, EMP
+WHERE SAL > 1000 AND SAL <= 2000;
+
+-- 2. Count the number of people in department 30 who receive a salary and a commission. 
+SELECT COUNT(*)
+FROM EMP
+WHERE SAL IS NOT NULL AND SAL != 0 AND COMM IS NOT NULL AND COMM != 0 AND DEPTNO = 30;
+
+-- 3. Find the name and salary of the employees that have a salary greater or equal to 1,000 and live in Dallas.
+SELECT ENAME AS 'DALLAS EMPLOYEE NAME', SAL AS 'SALARY'
+FROM EMP AS E
+INNER JOIN DEPT AS D ON E.DEPTNO = D.DEPTNO 
+WHERE E.SAL >= 1000 AND D.LOC = 'DALLAS';
+
+-- 4. Find all departments that do not have any current employees. (4 marks)
+SELECT E.*
+FROM EMP AS E
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM DEPT AS D
+    WHERE D.DEPTNO = E.DEPTNO
+      AND D.DNAME = 'ACCOUNTING'
+      OR D.DNAME = 'RESEARCH'
+      OR D.DNAME = 'SALES'
+);
+
+-- 5. List the department number, the average salary, and the number/count of employees of each department.
+SELECT D.DNAME AS 'DEPARTMENT NAME', E.DEPTNO AS 'DEPARTMENT NUMBER', AVG(E.SAL) AS 'AVERAGE SALARY', COUNT(E.EMPNO) AS 'NUMBER OF EMPLOYEES'
+FROM DEPT AS D
+INNER JOIN EMP AS E ON E.DEPTNO = D.DEPTNO
+GROUP BY D.DEPTNO;
+
+
+    </code></pre>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+
+</body>
+</html>

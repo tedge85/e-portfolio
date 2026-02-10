@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amended wallet.py</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet" />
+</head>
+<body>
+    <h1>Amended wallet.py code</h1>
+    <pre><code class="language-python">
+# code source: https://semaphoreci.com/community/tutorials/testing-python-applications-with-pytest
+
+# ***TASK: Amend the code so that the tests fail.***
+
+class InsufficientAmount(Exception):
+    pass
+
+class Wallet(object):
+
+    def __init__(self, initial_amount=0):
+        self.balance = initial_amount + 5 # '+ 5' added so that test_default_initial_amount() and
+                                          # test_setting_initial_amount() tests fail.
+
+    def spend_cash(self, amount):
+        if self.balance > amount: # '<' changed to '>' so that test_wallet_spend_cash() and
+                                  # test_wallet_spend_cash_raises_exception_on_insufficient_amount()
+                                  # tests fail.
+            raise InsufficientAmount('Not enough available to spend {}'.format(amount))
+        self.balance -= amount
+
+    def add_cash(self, amount):
+        self.balance -= amount # '+=' changed to '-=' so that test_wallet_add_cash() test fails.
+    </code></pre>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+
+</body>
+</html>
